@@ -46,9 +46,7 @@ module.exports.postEditProduct = (req, res, next) => {
   const updateProduct = new Product(title, price, imageUrl, description);
   updateProduct.id = productId;
 
-  updateProduct.save();
-
-  res.redirect('/');
+  updateProduct.save().then(res.redirect('/')).catch(console.log);
 };
 
 exports.getProducts = (req, res, next) => {
