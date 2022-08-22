@@ -1,7 +1,9 @@
 const Product = require('../models/products');
 
 module.exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  // res.sendFile(path.join(rootDir, 'views', 'shop'));
+
+  Product.findAll()
     .then((products) => {
       res.render('shop/product-list', {
         pageTitle: 'All Products',
@@ -13,7 +15,7 @@ module.exports.getProducts = (req, res, next) => {
 };
 
 module.exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.findAll()
     .then((products) => {
       res.render('shop/index', {
         pageTitle: 'Shop',
@@ -142,7 +144,7 @@ module.exports.getCheckout = (req, res, next) => {
 
 module.exports.getProduct = (req, res, next) => {
   const { id } = req.params;
-  Product.findById(id)
+  Product.findByPk(id)
     .then((product) => {
       res.render('shop/product-detail', {
         product: product,

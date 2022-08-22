@@ -11,13 +11,10 @@ module.exports.getAddProduct = (req, res, next) => {
 };
 
 module.exports.postAddProduct = (req, res, next) => {
-  const product = Product.buildProduct(req.body);
-
-  product
-    .save()
-    .then((result) => {
-      console.log('Created Product!');
-      console.log(result);
+  req.user
+    .createProduct({ ...req.body })
+    .then(() => {
+      console.log('Created Product');
       res.redirect('/admin/products');
     })
     .catch(console.log);
