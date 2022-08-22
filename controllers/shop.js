@@ -1,7 +1,5 @@
 const Product = require('../models/products');
 
-const Cart = require('../models/cart');
-
 module.exports.getProducts = (req, res, next) => {
   // res.sendFile(path.join(rootDir, 'views', 'shop'));
 
@@ -94,11 +92,47 @@ module.exports.postCart = (req, res, next) => {
     .catch(console.log);
 };
 
+exports.postOrder = (req, res, next) => {
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      req.user
+        .createOrder()
+        .then((order) => {
+          order.addProducts(
+            products.map((product) => {
+              product.orderItem = {
+                quantity: product.cartItem.quantity,
+              };
+              return product;
+            })
+          );
+        })
+        .catch(console.log);
+    })
+    .then((result) => {
+      res.redirect('/orders');
+      return fetchedCart.setProducts(null);
+    })
+    .catch(console.log);
+};
+
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders',
-  });
+  req.user
+    .getOrders({ include: ['products'] }) //eagar loading
+    .then((orders) => {
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders,
+      });
+    })
+    .catch(console.log);
 };
 
 module.exports.getCheckout = (req, res, next) => {
