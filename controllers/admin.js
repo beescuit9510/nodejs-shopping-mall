@@ -1,8 +1,6 @@
 const Product = require('../models/products');
 
 module.exports.getAddProduct = (req, res, next) => {
-  // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
-
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
@@ -29,11 +27,11 @@ module.exports.getEditProduct = (req, res, next) => {
     res.redirect('/');
     return;
   }
+
   const prodId = req.params.productId;
 
-  req.user
-    .getProducts({ where: { id: prodId } })
-    .then(([product]) => {
+  Product.findById(prodId)
+    .then((product) => {
       if (!product) {
         return res.redirect('/');
       }
@@ -49,13 +47,10 @@ module.exports.getEditProduct = (req, res, next) => {
 };
 
 module.exports.postEditProduct = (req, res, next) => {
-  const { productId, title, price, imageUrl, description } = req.body;
+  const product = Product.buildProduct(req.body);
 
-  Product.findByPk(productId)
-    .then((product) => {
-      Object.assign(product, { ...req.body });
-      return product.save();
-    })
+  product
+    .save()
     .then(() => {
       console.log('UPDATED PRODUCT!');
       res.redirect('/');
@@ -64,8 +59,7 @@ module.exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  req.user
-    .getProducts()
+  Product.fetchAll()
     .then((products) => {
       res.render('admin/products', {
         prods: products,
@@ -79,20 +73,10 @@ exports.getProducts = (req, res, next) => {
 module.exports.postDeleteProduct = (req, res, next) => {
   const { productId } = req.body;
 
-  Product.findByPk(productId)
-    .then((product) => {
-      return product.destroy();
-    })
-    .then((result) => {
+  Product.deleteById(productId)
+    .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
     })
     .catch(console.log);
-
-  // Product.destory({ where: { id: productId } })
-  //   .then(() => {
-  //     console.log('DESTROYED PRODUCT');
-  //     res.redirect('/admin/products');
-  //   })
-  //   .catch(console.log);
 };
