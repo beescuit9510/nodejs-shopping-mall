@@ -2,22 +2,24 @@ const mongodb = require('mongodb');
 const { getDb } = require('../util/databse');
 
 class Product {
-  constructor(title, price, description, imageUrl, id) {
+  constructor(title, price, description, imageUrl, id, userId) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
     this._id = id;
+    this.userId = userId;
   }
 
-  static buildProduct(body) {
+  static buildProduct(body, user) {
     const { title, price, description, imageUrl, prodId, productId } = body;
+    const { _id: userId } = user;
+
     const id = prodId ?? productId;
     let _id = null;
-
     if (id) _id = new mongodb.ObjectId(id);
 
-    return new Product(title, price, description, imageUrl, _id);
+    return new Product(title, price, description, imageUrl, _id, userId);
   }
 
   save() {

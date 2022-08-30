@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const errorController = require('./controllers/error');
+const User = require('./models/user');
 
 const { mongoConnect } = require('./util/databse');
 
@@ -15,16 +16,14 @@ app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use((req, res, next) => {
-//   //register dummy user
-//   // User.findByPk(1)
-//   //   .then((user) => {
-//   //     req.user = user;
-//   //     next();
-//   //   })
-//   //   .catch(console.log);
-//   next();
-// });
+app.use((req, res, next) => {
+  User.findById('630b855011de4fabf56a2adb')
+    .then((user) => {
+      req.user = User.buildUser(user);
+      next();
+    })
+    .catch(console.log);
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);

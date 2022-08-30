@@ -9,7 +9,7 @@ module.exports.getAddProduct = (req, res, next) => {
 };
 
 module.exports.postAddProduct = (req, res, next) => {
-  const product = Product.buildProduct(req.body);
+  const product = Product.buildProduct(req.body, req.user);
 
   product
     .save()
