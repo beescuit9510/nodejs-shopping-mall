@@ -53,26 +53,7 @@ module.exports.postCart = (req, res, next) => {
 exports.postOrder = (req, res, next) => {
   let fetchedCart;
   req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
-    .then((products) => {
-      req.user
-        .createOrder()
-        .then((order) => {
-          order.addProducts(
-            products.map((product) => {
-              product.orderItem = {
-                quantity: product.cartItem.quantity,
-              };
-              return product;
-            })
-          );
-        })
-        .catch(console.log);
-    })
+    .addOrder()
     .then((result) => {
       res.redirect('/orders');
       return fetchedCart.setProducts(null);
@@ -82,7 +63,7 @@ exports.postOrder = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   req.user
-    .getOrders({ include: ['products'] }) //eagar loading
+    .getOrder()
     .then((orders) => {
       res.render('shop/orders', {
         path: '/orders',
@@ -111,16 +92,6 @@ module.exports.getProduct = (req, res, next) => {
       });
     })
     .catch(console.log);
-
-  // Product.find({ where: { id: id } })
-  //   .then((product) => {
-  //     res.render('shop/product-detail', {
-  //       product: product,
-  //       pageTitle: product?.title,
-  //       path: '/products',
-  //     });
-  //   })
-  //   .catch(console.log);
 };
 
 module.exports.postCartDeleteProduct = (req, res, next) => {
